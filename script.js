@@ -46,7 +46,7 @@ const GameBoard = (function(doc){
     function getPlaceEight(){
         return placeEight;
     }
-    return {places, getPlaceZero, getPlaceTwo, getPlaceOne, getPlaceThree, getPlaceFour, getPlaceFive, getPlaceSix, getPlaceSeven, getPlaceEight}
+    return {getPlaces,resetPlaces, getPlaceZero, getPlaceTwo, getPlaceOne, getPlaceThree, getPlaceFour, getPlaceFive, getPlaceSix, getPlaceSeven, getPlaceEight}
 })(document)
 
 function Player(mark){
@@ -65,7 +65,7 @@ function isHorizontalWinner(play, placeID){
         if(placeID > 8){
             placeID = placeID%3;
         }
-        if(GameBoard.places[placeID]===play){
+        if(GameBoard.getPlaces()[placeID]===play){
             horizontalCheck++
             if(horizontalCheck==2){
                 return true;
@@ -78,30 +78,30 @@ function isHorizontalWinner(play, placeID){
 }
 function isVerticalWinner(play, placeID){
     if(placeID%3 === 0){
-        return ((GameBoard.places[placeID+1]===play)&&(GameBoard.places[placeID+2]===play))
+        return ((GameBoard.getPlaces()[placeID+1]===play)&&(GameBoard.getPlaces()[placeID+2]===play))
     }
     else if(placeID%3 === 1){
-        return ((GameBoard.places[placeID+1]===play)&&(GameBoard.places[placeID-1]===play))
+        return ((GameBoard.getPlaces()[placeID+1]===play)&&(GameBoard.getPlaces()[placeID-1]===play))
     }
     else{
-        return ((GameBoard.places[placeID-1]===play)&&(GameBoard.places[placeID-2]===play))
+        return ((GameBoard.getPlaces()[placeID-1]===play)&&(GameBoard.getPlaces()[placeID-2]===play))
     }
 }
 function isDiagonalWinner(play, placeID){
     if(placeID===4){
-        return (((GameBoard.places[placeID+2]===play )&&(GameBoard.places[placeID-2]===play)) || ((GameBoard.places[placeID-4]===play)&&(GameBoard.places[placeID+4]===play)));
+        return (((GameBoard.getPlaces()[placeID+2]===play )&&(GameBoard.getPlaces()[placeID-2]===play)) || ((GameBoard.getPlaces()[placeID-4]===play)&&(GameBoard.getPlaces()[placeID+4]===play)));
     }
     else if(placeID===0){
-        return ((GameBoard.places[placeID+4]===play)&&(GameBoard.places[placeID+8]===play));
+        return ((GameBoard.getPlaces()[placeID+4]===play)&&(GameBoard.getPlaces()[placeID+8]===play));
     }
     else if(placeID===8){
-        return ((GameBoard.places[placeID-4]===play)&&(GameBoard.places[placeID-8]===play));
+        return ((GameBoard.getPlaces()[placeID-4]===play)&&(GameBoard.getPlaces()[placeID-8]===play));
     }
     else if(placeID===2){
-        return ((GameBoard.places[placeID+2]===play)&&(GameBoard.places[placeID+4]===play));
+        return ((GameBoard.getPlaces()[placeID+2]===play)&&(GameBoard.getPlaces()[placeID+4]===play));
     }
     else if(placeID===6){
-        return ((GameBoard.places[placeID-2]===play)&&(GameBoard.places[placeID-4]===play));
+        return ((GameBoard.getPlaces()[placeID-2]===play)&&(GameBoard.getPlaces()[placeID-4]===play));
     }
 }
 const GameReferee = (function(board, player1, player2){
@@ -118,21 +118,36 @@ const GameReferee = (function(board, player1, player2){
     }
     function checkWinnerMove(play, placeID){
         if(isHorizontalWinner(play,placeID)||isVerticalWinner(play,placeID)||isDiagonalWinner(play,placeID)){
-            return `${play} wins`
+            GameBoard.resetPlaces();
+            for(let prop in GameBoard){
+                if(prop==='getPlaces' || prop==='resetPlaces'){
+                    continue;
+                }
+                GameBoard[prop]().textContent = '';
+            }
+            document.querySelector('#result span').textContent = `${play} wins`;
+            const overlay = document.querySelector('.overlay');
+            overlay.textContent = `${play} wins`;
+            overlay.style.display = 'flex';
+            setTimeout(()=>{
+                overlay.style.display = 'none';
+            },1000);
+            plays = []
+            return true;
         }
     }
     return {chooseNextPlayer, checkWinnerMove}
 })(GameBoard,playerX,playerO);
 
 for(let prop in GameBoard){
-    if (!(GameBoard[prop] instanceof Function)){
+    if ((prop==='getPlaces' || prop==='resetPlaces')){
         continue;
     }
     GameBoard[prop]().addEventListener('click', ()=>{
         // return //This event listener needs modification, after making players and referee objects
         if (!(GameBoard[prop]().textContent)){
             play = GameReferee.chooseNextPlayer().getPlayerMark();
-            GameBoard.places.splice(GameBoard[prop]().id, 1,play)
+            GameBoard.getPlaces().splice(GameBoard[prop]().id, 1,play)
             GameBoard[prop]().textContent = play;
             console.log(GameReferee.checkWinnerMove(play, parseInt(GameBoard[prop]().id)));
         }

@@ -376,3 +376,14 @@ template {
 .checkerboard div:nth-child(even){
     background-color: #F7ECDE;
 }
+.overlay{
+  position:fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30vw;
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(128, 128, 128, .1);
+  display: none;
+}

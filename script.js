@@ -125,14 +125,22 @@ const GameReferee = (function(board, player1, player2){
                 }
                 GameBoard[prop]().textContent = '';
             }
-            document.querySelector('#result span').textContent = `${play} wins`;
             const overlay = document.querySelector('.overlay');
             overlay.textContent = `${play} wins`;
             overlay.style.display = 'flex';
+            if(play==='X'){
+                const playerOne = document.querySelector('#player1 span');
+                playerOne.textContent = parseInt(playerOne.textContent) + 1;
+            }
+            else{
+                const playerTwo = document.querySelector('#player2 span');
+                playerTwo.textContent = parseInt(playerTwo.textContent) + 1;
+            }
             setTimeout(()=>{
                 overlay.style.display = 'none';
             },1000);
             plays = []
+
             return true;
         }
     }

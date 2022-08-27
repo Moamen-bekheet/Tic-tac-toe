@@ -11,6 +11,14 @@ const GameBoard = (function(doc){
     placeSix = doc.getElementById('6')
     placeSeven = doc.getElementById('7')
     placeEight= doc.getElementById('8')
+    function getPlaces(){
+        return places;
+    }
+    function resetPlaces(){
+        places = ['','',''
+        ,'','',''
+        ,'','',''];
+    }
     function getPlaceZero(){
         return placeZero;
     }
@@ -50,17 +58,50 @@ function Player(mark){
 
 let playerX = Player('X');
 let playerO = Player('O')
-function horizontalCheck(board, play, placeID){
-    let horizontalCounter = 0;
-    while(horizontalCounter < 3){
+function isHorizontalWinner(play, placeID){
+    let horizontalCheck = 0;
+    while(true){
         placeID = placeID + 3;
         if(placeID > 8){
-            placeID = placeID % 3;
+            placeID = placeID%3;
         }
-        if(board.places[placeID]===play){
-            horizontalCounter++
-            if()
+        if(GameBoard.places[placeID]===play){
+            horizontalCheck++
+            if(horizontalCheck==2){
+                return true;
+            }
         }
+        else{
+            return false
+        }
+    }
+}
+function isVerticalWinner(play, placeID){
+    if(placeID%3 === 0){
+        return ((GameBoard.places[placeID+1]===play)&&(GameBoard.places[placeID+2]===play))
+    }
+    else if(placeID%3 === 1){
+        return ((GameBoard.places[placeID+1]===play)&&(GameBoard.places[placeID-1]===play))
+    }
+    else{
+        return ((GameBoard.places[placeID-1]===play)&&(GameBoard.places[placeID-2]===play))
+    }
+}
+function isDiagonalWinner(play, placeID){
+    if(placeID===4){
+        return (((GameBoard.places[placeID+2]===play )&&(GameBoard.places[placeID-2]===play)) || ((GameBoard.places[placeID-4]===play)&&(GameBoard.places[placeID+4]===play)));
+    }
+    else if(placeID===0){
+        return ((GameBoard.places[placeID+4]===play)&&(GameBoard.places[placeID+8]===play));
+    }
+    else if(placeID===8){
+        return ((GameBoard.places[placeID-4]===play)&&(GameBoard.places[placeID-8]===play));
+    }
+    else if(placeID===2){
+        return ((GameBoard.places[placeID+2]===play)&&(GameBoard.places[placeID+4]===play));
+    }
+    else if(placeID===6){
+        return ((GameBoard.places[placeID-2]===play)&&(GameBoard.places[placeID-4]===play));
     }
 }
 const GameReferee = (function(board, player1, player2){
@@ -75,8 +116,10 @@ const GameReferee = (function(board, player1, player2){
             return player2;
         }
     }
-    function checkWinnerMove(board, play, placeID){
-        
+    function checkWinnerMove(play, placeID){
+        if(isHorizontalWinner(play,placeID)||isVerticalWinner(play,placeID)||isDiagonalWinner(play,placeID)){
+            return `${play} wins`
+        }
     }
     return {chooseNextPlayer, checkWinnerMove}
 })(GameBoard,playerX,playerO);
@@ -88,10 +131,10 @@ for(let prop in GameBoard){
     GameBoard[prop]().addEventListener('click', ()=>{
         // return //This event listener needs modification, after making players and referee objects
         if (!(GameBoard[prop]().textContent)){
-            GameBoard.places.splice(GameBoard[prop]().id, 1,'X')
             play = GameReferee.chooseNextPlayer().getPlayerMark();
+            GameBoard.places.splice(GameBoard[prop]().id, 1,play)
             GameBoard[prop]().textContent = play;
-            console.log(GameBoard.places)
+            console.log(GameReferee.checkWinnerMove(play, parseInt(GameBoard[prop]().id)));
         }
         else{
             return;

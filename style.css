@@ -360,7 +360,7 @@ template {
     background-color: #54BAB9;
     display: grid;
     grid-template-columns: repeat(3,1fr);
-    font-size: 5vw;
+    font-size: 2vh;
 }
 .checkerboard{
     background-color: #E9DAC1;

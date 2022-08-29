@@ -72,7 +72,7 @@ function isHorizontalWinner(play, placeID){
             }
         }
         else{
-            return false
+            return false;
         }
     }
 }
@@ -102,6 +102,9 @@ function isDiagonalWinner(play, placeID){
     }
     else if(placeID===6){
         return ((GameBoard.getPlaces()[placeID-2]===play)&&(GameBoard.getPlaces()[placeID-4]===play));
+    }
+    else{
+        return false;
     }
 }
 const GameReferee = (function(board, player1, player2){
@@ -143,6 +146,24 @@ const GameReferee = (function(board, player1, player2){
 
             return true;
         }
+        else if ((!(isHorizontalWinner(play,placeID)||isVerticalWinner(play,placeID)||isDiagonalWinner(play,placeID))) && plays.length === 9 ){
+            GameBoard.resetPlaces();
+            console.log(isDiagonalWinner(play,placeID), isVerticalWinner(play,placeID), isHorizontalWinner(play,placeID));
+            for(let prop in GameBoard){
+                if(prop==='getPlaces' || prop==='resetPlaces'){
+                    continue;
+                }
+                GameBoard[prop]().textContent = '';
+            }
+            const overlay = document.querySelector('.overlay');
+            overlay.textContent = `Draw`;
+            overlay.style.display = 'flex';
+            setTimeout(()=>{
+                overlay.style.display = 'none';
+            },1000);
+            plays = []
+            return false;
+        }
     }
     return {chooseNextPlayer, checkWinnerMove}
 })(GameBoard,playerX,playerO);
@@ -157,7 +178,7 @@ for(let prop in GameBoard){
             play = GameReferee.chooseNextPlayer().getPlayerMark();
             GameBoard.getPlaces().splice(GameBoard[prop]().id, 1,play)
             GameBoard[prop]().textContent = play;
-            console.log(GameReferee.checkWinnerMove(play, parseInt(GameBoard[prop]().id)));
+            GameReferee.checkWinnerMove(play, parseInt(GameBoard[prop]().id));
         }
         else{
             return;

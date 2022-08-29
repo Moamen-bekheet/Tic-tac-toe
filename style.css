@@ -371,7 +371,7 @@ template {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 15vw;
+    font-size: 8rem;
 }
 .checkerboard div:nth-child(even){
     background-color: #F7ECDE;
